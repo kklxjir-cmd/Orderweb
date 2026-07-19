@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPL PROJECT | WEB ORDER</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif;}
+        html {scroll-behavior:smooth; height:100%; overflow-x:hidden;}
+        body {min-height:100%; padding:80px 20px 40px; color:#fff; position:relative; overflow-x:hidden; background:transparent;}
+        @keyframes muncul {from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);}}
+        @keyframes berkedip {0%,100% {opacity:1;} 50% {opacity:0.4;}}
+        .wadah {max-width:580px; margin:0 auto; position:relative; z-index:2;}
+        .bagian {display:none; animation:muncul 0.5s ease-out;}
+        .bagian.aktif {display:block;}
+        .halaman-blokir {position:fixed; inset:0; background:rgba(5,7,16,0.95); display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; z-index:9999; text-align:center;}
+        .halaman-blokir.aktif {display:flex;}
+        .teks-blokir {font-size:1.5rem; font-weight:900; color:#ff4d4f; line-height:1.6; max-width:450px;}
+        .layar-proses {position:fixed; inset:0; background:rgba(5,7,16,0.85); display:none; flex-direction:column; align-items:center; justify-content:center; gap:20px; z-index:999; backdrop-filter:blur(8px);}
+        .layar-proses.aktif {display:flex;}
+        .teks-proses {font-size:1.5rem; font-weight:bold; color:#93c5fd; animation:berkedip 1s ease infinite;}
+        .ikon-loading {width:60px; height:60px; border:4px solid rgba(59,130,246,0.3); border-top-color:#3b82f6; border-radius:50%; animation:putar 1s linear infinite;}
+        @keyframes putar {to {transform:rotate(360deg);}}
+        .kembali {display:inline-flex; align-items:center; gap:10px; padding:12px 20px; color:#93c5fd; font-weight:bold; font-size:1.05rem; cursor:pointer; margin-bottom:30px; text-decoration:none; background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.35); border-radius:50px; backdrop-filter:blur(6px); transition:all 0.3s ease;}
+        .kembali:hover {background:rgba(59,130,246,0.25); border-color:rgba(96,165,250,0.6); color:#dbeafe; transform:translateX(-3px);}
+        .kembali svg {width:20px; height:20px; flex-shrink:0;}
+        .judul-bagian {font-size:2rem; font-weight:900; text-align:center; margin-bottom:30px; color:#fff;}
+        .foto-produk {width:100%; border-radius:18px; margin-bottom:25px; border:3px solid rgba(59,130,246,0.6);}
+        .foto-produk img {width:100%; border-radius:18px; display:block;}
+        .daftar-fitur {background:rgba(15,32,68,0.5); border:2px solid rgba(59,130,246,0.4); border-radius:18px; padding:25px; margin-bottom:30px; text-align:left; backdrop-filter:blur(4px);}
+        .daftar-fitur h3 {color:#93c5fd; text-align:center; margin-bottom:18px; font-size:1.5rem; text-transform:uppercase; font-weight:900;}
+        .daftar-fitur p {color:#dbeafe; margin:8px 0; padding-left:28px; position:relative; font-size:1.1rem;}
+        .daftar-fitur p::before {content:""; position:absolute; left:0;}
+        .tambah {color:#ffdd00; font-weight:900; text-align:center; margin-top:15px; display:block;}
+        .harga {font-size:2rem; font-weight:900; color:#ffdd00; text-align:center; margin:20px 0 25px; text-shadow:0 0 15px rgba(255,221,0,0.4);}
+        .tombol-lanjut {display:block; width:100%; padding:20px; font-size:1.3rem; font-weight:900; color:#fff; background:rgba(16,185,129,0.75); border:none; border-radius:15px; cursor:pointer; margin-bottom:12px; transition:all 0.2s ease; box-shadow:0 0 20px rgba(16,185,129,0.3);}
+        .tombol-lanjut:hover {background:rgba(5,150,105,0.9); transform:scale(1.02);}
+        .tombol-lanjut:active {transform:scale(0.97);}
+        .tombol-saluran {display:inline-flex; align-items:center; gap:6px; padding:8px 16px; font-size:0.9rem; font-weight:bold; color:#93c5fd; background:rgba(59,130,246,0.15); border:1px solid rgba(96,165,250,0.4); border-radius:50px; text-decoration:none; cursor:pointer; transition:all 0.2s ease; margin-bottom:30px;}
+        .tombol-saluran:hover {background:rgba(59,130,246,0.25); color:#dbeafe; border-color:rgba(96,165,250,0.7);}
+        .judul-bayar {font-size:1.8rem; font-weight:900; text-align:center; margin-bottom:25px; color:#ffdd00;}
+        .peringatan-pembayaran {border:3px solid #ff9800; background:rgba(255,152,0,0.15); color:#ffeb3b; padding:18px; border-radius:12px; margin-bottom:25px; font-weight:bold; font-size:1rem; line-height:1.7; backdrop-filter:blur(4px);}
+        .qris-box {background:rgba(15,23,42,0.55); border:2px dashed rgba(96,165,250,0.4); border-radius:18px; padding:25px; margin-bottom:25px; text-align:center; backdrop-filter:blur(4px);}
+        .qris-box img {width:100%; border-radius:12px; margin-bottom:15px; border:2px solid rgba(255,255,255,0.2); display:block; max-width:320px; height:auto; object-fit:contain; margin:0 auto;}
+        .tombol-simpan {width:100%; padding:15px; background:rgba(30,58,138,0.8); color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; cursor:pointer; transition:all 0.2s ease;}
+        .tombol-simpan:hover {background:rgba(30,58,138,1); transform:scale(1.02);}
+        .area-input {transition:all 0.3s ease;}
+        .area-input.sembunyi {opacity:0; height:0; margin:0; overflow:hidden; pointer-events:none;}
+        .tombol-pilih {display:block; padding:18px; border:2px dashed rgba(96,165,250,0.6); border-radius:15px; color:#93c5fd; font-weight:bold; cursor:pointer; margin-bottom:18px; background:rgba(59,130,246,0.15); font-size:1.2rem; text-align:center; backdrop-filter:blur(4px); transition:all 0.2s ease;}
+        .tombol-pilih:hover {border-color:#60a5fa; background:rgba(59,130,246,0.25);}
+        input[type=file] {display:none;}
+        .preview {border:2px solid rgba(59,130,246,0.6); border-radius:15px; padding:15px; margin-bottom:18px; background:rgba(15,23,42,0.5); min-height:180px; display:flex; align-items:center; justify-content:center; color:#93c5fd; font-weight:bold; backdrop-filter:blur(4px);}
+        .preview img {width:100%; border-radius:10px; display:block;}
+        .tombol-kirim {width:100%; padding:20px; background:rgba(15,23,42,0.8); color:#fff; border:3px solid rgba(59,130,246,0.7); border-radius:15px; font-size:1.5rem; font-weight:900; cursor:pointer; box-shadow:0 0 20px rgba(16,185,129,0.2); transition:all 0.3s ease;}
+        .tombol-kirim.sembunyi {opacity:0; height:0; margin:0; padding:0; border:none; pointer-events:none;}
+        .tombol-kirim:disabled {opacity:0.4; cursor:not-allowed;}
+        .tombol-kirim:hover {background:rgba(30,41,59,0.95); transform:scale(1.02);}
+        .info-proses {display:none; color:#fbbf24; padding:18px; border:2px solid rgba(251,191,36,0.7); border-radius:12px; margin:20px 0; background:rgba(251,191,36,0.12); font-weight:bold; font-size:1.2rem; backdrop-filter:blur(4px);}
+        .info-proses.aktif {display:block;}
+        .pesan {display:none; padding:18px; border-radius:15px; font-weight:bold; margin:20px 0; font-size:1.2rem; text-align:center; backdrop-filter:blur(4px);}
+        .pesan.sukses {display:block; border:2px solid rgba(16,185,129,0.7); color:#86efac; background:rgba(16,185,129,0.12);}
+        .pesan.gagal {display:block; border:2px solid rgba(239,68,68,0.7); color:#fca5a5; background:rgba(239,68,68,0.12);}
+        .info-berhasil {display:none; margin-top:25px; padding:25px; border:3px solid rgba(16,185,129,0.7); border-radius:18px; background:rgba(16,185,129,0.15); text-align:center; backdrop-filter:blur(8px);}
+        .info-berhasil.tampil {display:block;}
+        .info-berhasil h2 {color:#86efac; margin-bottom:20px; font-size:2rem; font-weight:900; text-transform:uppercase;}
+        .form-request {margin-top:20px; text-align:left;}
+        .form-request.sembunyi {display:none !important;}
+        .hasil-teks {background:rgba(15,23,42,0.7); border:2px solid #ffdd00; border-radius:12px; padding:18px; margin:20px 0; text-align:left; font-weight:bold; font-size:1.1rem; line-height:1.8; color:#fff;}
+        .syarat-pw {font-size:0.9rem; color:#ffdd00; margin-top:5px; line-height:1.5;}
+        .input-group {margin-bottom:15px;}
+        .input-group label {display:block; margin-bottom:8px; font-weight:bold; color:#93c5fd; font-size:1.1rem;}
+        .input-group input {width:100%; padding:14px; border-radius:10px; border:2px solid rgba(96,165,250,0.5); background:rgba(15,23,42,0.7); color:#fff; font-size:1rem; outline:none; transition:all 0.2s ease;}
+        .input-group input:focus {border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.3);}
+        .tombol-salin {width:100%; padding:16px; background:rgba(255,221,0,0.85); color:#000; border:none; border-radius:12px; font-weight:900; font-size:1.2rem; cursor:pointer; margin-bottom:12px; transition:all 0.2s ease;}
+        .tombol-salin:hover {background:rgba(255,221,0,1); transform:translateY(-2px);}
+        .tombol-hubungi {width:100%; padding:16px; background:#25d366; color:#fff; border:none; border-radius:12px; font-weight:900; font-size:1.2rem; cursor:pointer; transition:all 0.2s ease; text-decoration:none; display:block; text-align:center;}
+        .tombol-hubungi:hover {background:#128c7e; transform:translateY(-2px);}
+        .pesan-salin {text-align:center; color:#86efac; font-weight:bold; margin:10px 0; display:none;}
+        .pesan-salin.aktif {display:block;}
+        video {position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:0; pointer-events:none;}
+    </style>
+</head>
+<body>
+    <video autoplay muted loop playsinline>
+        <source src="https://www.image2url.com/r2/default/videos/1783267463148-d941441a-03bd-43ce-b70c-31714136682f.mp4" type="video/mp4">
+    </video>
+    <div style="position:fixed; inset:0; background:rgba(5,7,16,0.4); z-index:1;"></div>
+
+    <div class="halaman-blokir" id="halamanBlokir">
+        <div class="teks-blokir"> ANDA TELAH DIBLOKIR<br>Karena gagal mengirim bukti 1 kali</div>
+    </div>
+
+    <div class="layar-proses" id="layarProses">
+        <div class="ikon-loading"></div>
+        <div class="teks-proses">SEDANG CEK DATA TRANSAKSI...</div>
+    </div>
+
+    <div class="wadah">
+        <div class="bagian aktif" id="halPplproject">
+            <h2 class="judul-bagian">PPL PROJECT</h2>
+            <div class="foto-produk">
+                <img src="https://i.ibb.co/zhSC5F4S/IMG-20260717-105101-303.jpg" alt="PPL PROJECT">
+            </div>
+            <div class="daftar-fitur"
+               <h3>FITUR BUG<h3>
+                <p>Crash UI Android</p>
+                <p>Crash IOS</p>
+                <p>Brute Transhold [ Tecno � Infinix � Itel ]</p>
+                <p>All work anti gimmick</p>
+                <br>
+                <h3> FITUR TOOLS</h3>
+                <p>Ddos Attack</p>
+                <p>Anime</p>
+                <p>Phone Lookup</p>
+                <p>Subdomain</p>
+                <p>Check Nik</p>
+                <p>Chat AI</p>
+                <p>Ada Fitur Sadap Canggih Dari Apk Ppl Contohnya Apk Suxrat</p>
+                <p>All tools work normal</p>
+                <span class="tambah">+ TUTORIAL FULL SETELAH PEMBELIAN</span>
+            </div>
+            <div class="harga"> HARGA: Rp 50.010 / RM 50.010 / PERMANEN</div>
+            <button class="tombol-lanjut" onclick="lanjutPembayaran()"> SAYA SETUJU & LANJUT KE PEMBAYARAN</button>
+            <div style="text-align:center;">
+                <a href="https://www.whatsapp.com/channel/0029VbCNa8EISTkC3UQnwe0f" target="_blank" class="tombol-saluran"> SALURAN WHATSAPP ADMIN</a>
+            </div>
+        </div>
+
+        <div class="bagian" id="halBayar">
+            <div class="kembali" onclick="bukaHalaman('halPplproject')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                KEMBALI KE DETAIL PRODUK
+            </div>
+            <h2 class="judul-bayar">PEMBAYARAN PPL PROJECT</h2>
+            <div class="peringatan-pembayaran">
+                 PERINGATAN WAJIB:<br>
+                 **WAJIB SCREENSHOT BUKTI PEMBAYARAN** � BUKAN DIFOTO<br>
+                 **HANYA BOLEH 1 KALI COBA SAJA**<br>
+                 GAGAL 1 KALI  LANGSUNG DIBLOKIR PERMANEN<br>
+                 NOMINAL: Rp 50.010 / RM 50.010
+            </div>
+            <div class="qris-box">
+                <img src="https://i.ibb.co/2YLk2gYd/IMG-20260717-110329-814.jpg" alt="QRIS Pembayaran">
+                <button class="tombol-simpan" onclick="alert('Gambar QRIS disimpan, silakan bayar lalu kirim screenshot')"> SIMPAN GAMBAR QRIS</button>
+            </div>
+            <div class="area-input" id="areaInput">
+                <label class="tombol-pilih" for="fileBukti"> PILIH FOTO BUKTI TRANSFER</label>
+                <input type="file" id="fileBukti" accept="image/*" onchange="tampilPreview(this)">
+                <div class="preview" id="preview">Belum ada foto dipilih</div>
+            </div>
+            <button class="tombol-kirim" id="tombolKirim" onclick="kirimBukti()"> KIRIM BUKTI TRANSFER</button>
+            <div class="info-proses" id="infoProses"> SEDANG MEMERIKSA...</div>
+            <div class="pesan" id="pesan"></div>
+            <div class="info-berhasil" id="infoBerhasil">
+                <h2>VALID SALIN TESK KIRIM KE ADMIN</h2>
+                 <div class="form-request" id="formRequest">
+                     <p style="margin-bottom:15px; text-align:center;">Silakan Buat Akun Akses PPL PROJECT </p>
+                     <div class="input-group">
+                         <label>Username</label>
+                         <input type="text" id="userAkun" placeholder="Masukkan Username Pilihan">
+                     </div>
+                     <div class="input-group">
+                         <label>Password Akun</label>
+                         <input type="password" id="pwAkun" placeholder="Buat Password Yang Kuat">
+                         <div class="syarat-pw"> Syarat Password:<br> Minimal 4 Huruf<br> Minimal 1 Angka<br> Minimal 2 Simbol (@ # $ ! % & *)</div>
+                     </div>
+                     <button class="tombol-kirim" style="font-size:1.2rem;padding:16px;" onclick="tampilkanTeks()"> BUAT & LIHAT TEKS</button>
+                 </div>
+
+                 <div id="bagianTeks" style="display:none;">
+                     <div class="hasil-teks" id="kotakTeks">
+USERNAME: <span id="tampilUser"></span>
+ PASSWORD: <span id="tampilPw"></span>
+                      </div>
+                      <button class="tombol-salin" onclick="salinTeks()">📋 SALIN TEKS</button>
+                      <div class="pesan-salin" id="notifSalin">✅ BERHASIL DISALIN!</div>
+                      <a href="https://wa.me/6285743518627" target="_blank" class="tombol-hubungi">💬 HUBUNGI ADMIN</a>
+                  </div>
+               </div>
+           </div>
+       </div>
+   <script>
+   const statusBlokir = localStorage.getItem('diblokir_lutbotz') === 'YA';
+   const statusValid = localStorage.getItem('bukti_valid') === 'YA';
+   let sedangProses = false;
+   if (statusBlokir) {
+       document.getElementById('halamanBlokir').classList.add('aktif');
+       document.body.style.overflow = 'hidden';
+   } else if (statusValid) {
+       document.querySelectorAll('.bagian').forEach(b => b.classList.remove('aktif'));
+       document.getElementById('halBayar').classList.add('aktif');
+       document.getElementById('areaInput').classList.add('sembunyi');
+       document.getElementById('tombolKirim').classList.add('sembunyi');
+       document.querySelector('.peringatan-pembayaran').style.display = 'none';
+       document.querySelector('.qris-box').style.display = 'none';
+       document.getElementById('infoBerhasil').classList.add('tampil');
+   }
+   function lanjutPembayaran() {
+       if (statusBlokir || statusValid || sedangProses) return;
+       const layar = document.getElementById('layarProses');
+       layar.classList.add('aktif');
+       setTimeout(() => {
+           bukaHalaman('halBayar');
+           layar.classList.remove('aktif');
+       }, 1500);
+   }
+   function bukaHalaman(id) {
+       if (statusBlokir || statusValid || sedangProses) return;
+       document.querySelectorAll('.bagian').forEach(b => b.classList.remove('aktif'));
+       document.getElementById(id).classList.add('aktif');
+       window.scrollTo(0, 0);
+   }
+   function tampilkanTeks() {
+       const user = document.getElementById('userAkun').value.trim();
+       const pw = document.getElementById('pwAkun').value.trim();
+       if (!user || user.length < 3) {alert('❌ Username minimal 3 karakter!'); return;}
+       const hitungHuruf = (pw.match(/[a-zA-Z]/g) || []).length;
+       const hitungAngka = (pw.match(/[0-9]/g) || []).length;
+       const hitungSimbol = (pw.match(/[^a-zA-Z0-9\s]/g) || []).length;
+       if (hitungHuruf < 4) {alert('❌ Password harus memiliki minimal 4 huruf!'); return;}
+       if (hitungAngka < 1) {alert('❌ Password harus memiliki minimal 1 angka!'); return;}
+       if (hitungSimbol < 2) {alert('❌ Password harus memiliki minimal 2 simbol!'); return;}
+       document.getElementById('tampilUser').textContent = user;
+       document.getElementById('tampilPw').textContent = pw;
+       document.getElementById('formRequest').classList.add('sembunyi');
+       document.getElementById('bagianTeks').style.display = 'block';
+   }
+   async function salinTeks() {
+       const teks = document.getElementById('kotakTeks').innerText;
+       try {
+           await navigator.clipboard.writeText(teks);
+           const notif = document.getElementById('notifSalin');
+           notif.classList.add('aktif');
+           setTimeout(() => notif.classList.remove('aktif'), 2500);
+       } catch {
+           alert('Gagal menyalin, silakan salin manual');
+       }
+   }
+   let sudahCoba = localStorage.getItem('sudah_coba') === 'YA';
+   let fileBukti = null;
+   function perjelasGambar(file) {
+       return new Promise(resolve => {
+           const img = new Image();
+           img.crossOrigin = "anonymous";
+           img.onload = () => {
+               const canvas = document.createElement('canvas');
+               const ctx = canvas.getContext('2d');
+               canvas.width = img.width * 2;
+               canvas.height = img.height * 2;
+               ctx.filter = 'grayscale(100%) contrast(800%) brightness(350%)';
+               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+               canvas.toBlob(b => resolve(b), 'image/png', 1.0);
+           };
+           img.onerror = () => resolve(file);
+           img.src = URL.createObjectURL(file);
+       });
+   }
+   function cekNamaPenerima(teks) {
+       const t = teks.toUpperCase().replace(/[^A-Z0-9]/g, '');
+       const variasiBenar = ['LOLIPOP', 'LOLLIPOP', '0LIPOP', '0LLIPOP', 'L0LIPOP', 'L0LLIPOP', 'LO1POP', 'L01POP'];
+       return variasiBenar.some(v => t.includes(v));
+   }
+   function cekNominal(teks) {
+       const angka = teks.replace(/[^0-9]/g, '');
+       return angka.includes('50010');
+   }
+   function tampilPreview(input) {
+       const pr = document.getElementById('preview');
+       const pesan = document.getElementById('pesan');
+       pesan.style.display = 'none';
+       if (input.files && input.files[0]) {
+           fileBukti = input.files[0];
+           const baca = new FileReader();
+           baca.onload = e => pr.innerHTML = `<img src="${e.target.result}" alt="Bukti">`;
+           baca.readAsDataURL(fileBukti);
+       } else {
+           pr.innerHTML = "Belum ada foto dipilih";
+           fileBukti = null;
+       }
+   }
+   async function kirimBukti() {
+       if (statusBlokir || statusValid || sudahCoba || sedangProses) return;
+       sedangProses = true;
+       const pesan = document.getElementById('pesan');
+       const infoProses = document.getElementById('infoProses');
+       const infoBerhasil = document.getElementById('infoBerhasil');
+       const areaInput = document.getElementById('areaInput');
+       const tombolKirim = document.getElementById('tombolKirim');
+       const peringatan = document.querySelector('.peringatan-pembayaran');
+       const kotakQris = document.querySelector('.qris-box');
+       pesan.style.display = 'none';
+       infoBerhasil.classList.remove('tampil');
+       
+       if (!fileBukti) {
+           pesan.className = 'pesan gagal';
+           pesan.textContent = '❌ Silakan pilih foto bukti terlebih dahulu!';
+           pesan.style.display = 'block';
+           sedangProses = false;
+           return;
+       }
+       sudahCoba = true;
+       localStorage.setItem('sudah_coba', 'YA');
+       infoProses.classList.add('aktif');
+       tombolKirim.disabled = true;
+       
+       try {
+           const gambarJelas = await perjelasGambar(fileBukti);
+           const hasilOcr = await Tesseract.recognize(gambarJelas, 'ind+eng', {
+               pageseg_mode: 3,
+               tessedit_do_invert: 0
+           });
+           const teksBersih = hasilOcr.data.text.toUpperCase().trim();
+           
+           const namaSesuai = cekNamaPenerima(teksBersih);
+           const nominalSesuai = cekNominal(teksBersih);
+           
+           console.log('Teks terbaca:', teksBersih);
+           console.log('Nama Cocok:', namaSesuai);
+           console.log('Nominal Cocok:', nominalSesuai);
+           
+           if (namaSesuai && nominalSesuai) {
+               localStorage.setItem('bukti_valid', 'YA');
+               areaInput.classList.add('sembunyi');
+               tombolKirim.classList.add('sembunyi');
+               peringatan.style.display = 'none';
+               kotakQris.style.display = 'none';
+               infoProses.classList.remove('aktif');
+               infoBerhasil.classList.add('tampil');
+           } else {
+               localStorage.setItem('diblokir_lutbotz', 'YA');
+               infoProses.classList.remove('aktif');
+               document.getElementById('halamanBlokir').classList.add('aktif');
+               document.body.style.overflow = 'hidden';
+           }
+       } catch (err) {
+           console.error('Error:', err);
+           localStorage.setItem('diblokir_lutbotz', 'YA');
+           infoProses.classList.remove('aktif');
+           document.getElementById('halamanBlokir').classList.add('aktif');
+           document.body.style.overflow = 'hidden';
+       } finally {
+           sedangProses = false;
+           tombolKirim.disabled = false;
+       }
+    }
+    </script>
+    </body>
+ </html>
