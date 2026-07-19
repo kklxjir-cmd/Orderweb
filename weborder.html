@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUTBOTZ | WEB ORDER</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.0.4/dist/tesseract.min.js"></script>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:Arial,sans-serif;}
+        html {scroll-behavior:smooth; height:100%; overflow-x:hidden;}
+        body {min-height:100%; padding:80px 20px 40px; color:#fff; position:relative; overflow-x:hidden; background:transparent;}
+        
+        @keyframes muncul {from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);}}
+        @keyframes gerakPanah {0% {transform:translateX(0);} 100% {transform:translateX(-4px);}}
+        @keyframes berkedip {0%,100% {opacity:1;} 50% {opacity:0.4;}}
+        @keyframes naikTurun {from {transform:translateY(0);} to {transform:translateY(-5px);}}
+        
+        .wadah {max-width:580px; margin:0 auto; position:relative; z-index:2;}
+        .bagian {display:none; animation:muncul 0.5s ease-out;}
+        .bagian.aktif {display:block;}
+        
+        video {position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:0; pointer-events:none;}
+        .latar-gelap {position:fixed; inset:0; background:rgba(5,7,16,0.4); z-index:1;}
+
+        .halaman-blokir {position:fixed; inset:0; background:rgba(5,7,16,0.95); display:none; flex-direction:column; align-items:center; justify-content:center; padding:30px; z-index:9999; text-align:center;}
+        .halaman-blokir.aktif {display:flex;}
+        .teks-blokir {font-size:1.5rem; font-weight:900; color:#ff4d4f; line-height:1.6; max-width:450px;}
+
+        .layar-proses {position:fixed; inset:0; background:rgba(5,7,16,0.92); display:none; flex-direction:column; align-items:center; justify-content:center; gap:20px; z-index:999; padding:25px; backdrop-filter:blur(8px);}
+        .layar-proses.aktif {display:flex;}
+        .teks-proses {font-size:1.2rem; font-weight:bold; color:#fbbf24; animation:berkedip 1s ease infinite; text-align:center; line-height:1.8; padding:0 15px;}
+        .ikon-loading {width:60px; height:60px; border:4px solid rgba(251,191,36,0.3); border-top-color:#fbbf24; border-radius:50%; animation:putar 1s linear infinite;}
+        @keyframes putar {to {transform:rotate(360deg);}}
+
+        .header {display:flex; align-items:center; gap:12px; margin-bottom:50px;}
+        .logo {font-size:1.8rem; font-weight:900; color:#fff; letter-spacing:1px;}
+        .logo span {color:#3b82f6;}
+        
+        .label-atas {display:block; margin:0 auto 35px; padding:12px 24px; background:rgba(59,130,246,0.18); border:1px solid rgba(96,165,250,0.4); border-radius:50px; color:#93c5fd; font-weight:bold; font-size:1rem; text-align:center; animation:naikTurun 2s ease infinite alternate; backdrop-filter:blur(4px);}
+        
+        .judul-utama {font-size:2.8rem; font-weight:900; text-align:center; line-height:1.2; margin-bottom:15px;}
+        .judul-utama span {color:#3b82f6;}
+        
+        .deskripsi {text-align:center; color:#dbeafe; font-size:1.15rem; line-height:1.6; margin-bottom:30px; padding:0 10px;}
+        
+        .tombol-besar {display:block; width:92%; max-width:450px; margin:0 auto 30px; padding:22px; font-size:1.4rem; font-weight:900; color:#fff; background:rgba(37,99,235,0.75); border:none; border-radius:18px; cursor:pointer; transition:all 0.2s ease; text-align:center; box-shadow:0 0 25px rgba(59,130,246,0.3);}
+        .tombol-besar:hover {transform:translateY(-3px); background:rgba(59,130,246,0.9); box-shadow:0 10px 35px rgba(59,130,246,0.5);}
+        
+        .kotak-statistik {background:rgba(15,23,42,0.55); border:1px solid rgba(96,165,250,0.35); border-radius:16px; padding:25px 20px; margin-bottom:20px; display:flex; align-items:center; gap:18px; backdrop-filter:blur(4px);}
+        .ikon {width:55px; height:55px; border-radius:12px; background:rgba(59,130,246,0.2); display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0;}
+        .teks-stat {flex:1;}
+        .label-stat {font-size:1.1rem; color:#a5b4fc; font-weight:bold; margin-bottom:5px;}
+        .angka-stat {font-size:2.2rem; font-weight:900; color:#fff;}
+
+        .bagian-testimoni {margin-top:10px; margin-bottom:15px;}
+        .judul-testimoni {font-size:1.7rem; font-weight:900; text-align:center; margin-bottom:8px; color:#fff; letter-spacing:1px;}
+        .deskripsi-testimoni {text-align:center; color:#dbeafe; font-size:1rem; line-height:1.5; margin-bottom:15px; padding:0 10px;}
+        
+        .wrapper-geser {overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch; padding-bottom:8px;}
+        .wrapper-geser::-webkit-scrollbar {height:5px;}
+        .wrapper-geser::-webkit-scrollbar-thumb {background:rgba(255,255,255,0.2); border-radius:3px;}
+        
+        .daftar-kartu {display:flex; gap:15px; min-width:max-content; padding:0 5px;}
+        .kartu-testimoni {width:260px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:18px; flex-shrink:0;}
+        
+        .header-kartu {display:flex; align-items:center; gap:12px; margin-bottom:8px;}
+        .avatar {width:42px; height:42px; border-radius:50%; background:rgba(255,255,255,0.2); flex-shrink:0;}
+        .nama {font-weight:bold; font-size:1.05rem; color:#fff;}
+        .bintang {font-size:0.95rem; margin-bottom:10px; letter-spacing:2px;}
+        .isi-testimoni {color:#e2e8f0; font-size:0.95rem; line-height:1.6; margin:0;}
+
+        .bagian-komen {margin-top:10px; margin-bottom:25px; text-align:center;}
+        .tombol-komen {padding:14px 24px; font-size:1rem; font-weight:bold; color:#fff; background:rgba(59,130,246,0.2); border:2px solid rgba(96,165,250,0.5); border-radius:50px; cursor:pointer; transition:all 0.2s ease; backdrop-filter:blur(4px);}
+        .tombol-komen:hover {background:rgba(59,130,246,0.35); border-color:#60a5fa; transform:translateY(-2px);}
+        .kotak-pesan {display:none; margin-top:12px; padding:12px 20px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.6); border-radius:10px; color:#fca5a5; font-weight:bold; font-size:0.95rem; animation:muncul 0.3s ease-out;}
+
+        .kembali {display:inline-flex; align-items:center; gap:10px; padding:12px 20px; color:#93c5fd; font-weight:bold; font-size:1.05rem; cursor:pointer; margin-bottom:30px; text-decoration:none; background:rgba(59,130,246,0.12); border:1px solid rgba(96,165,250,0.35); border-radius:50px; backdrop-filter:blur(6px); transition:all 0.3s ease;}
+        .kembali:hover {background:rgba(59,130,246,0.25); border-color:rgba(96,165,250,0.6); color:#dbeafe; transform:translateX(-3px);}
+        .kembali:hover svg {animation:gerakPanah 0.5s ease infinite alternate;}
+        .kembali svg {width:20px; height:20px; flex-shrink:0;}
+
+        .judul-bagian {font-size:2rem; font-weight:900; text-align:center; margin-bottom:30px; color:#fff;}
+        .kartu-produk {background:rgba(15,23,42,0.55); border:2px solid rgba(59,130,246,0.4); border-radius:20px; padding:25px; margin-bottom:25px; cursor:pointer; transition:all 0.3s ease; backdrop-filter:blur(4px);}
+        .kartu-produk:hover {transform:translateY(-5px); border-color:#60a5fa; box-shadow:0 10px 30px rgba(59,130,246,0.3);}
+        .kartu-produk h3 {color:#ffdd00; font-size:1.8rem; font-weight:900; margin-bottom:10px; text-transform:uppercase;}
+        .kartu-produk p {color:#dbeafe; font-size:1.1rem; line-height:1.5;}
+        .foto-produk {width:100%; border-radius:18px; margin-bottom:25px; border:3px solid rgba(59,130,246,0.6); background:#fff; padding:8px;}
+        .foto-produk img {width:100%; border-radius:18px; display:block; object-fit:contain;}
+        .daftar-fitur {background:rgba(15,32,68,0.5); border:2px solid rgba(59,130,246,0.4); border-radius:18px; padding:25px; margin-bottom:30px; text-align:left; backdrop-filter:blur(4px);}
+        .daftar-fitur h3 {color:#93c5fd; text-align:center; margin-bottom:18px; font-size:1.5rem; text-transform:uppercase; font-weight:900;}
+        .daftar-fitur p {color:#dbeafe; margin:8px 0; padding-left:28px; position:relative; font-size:1.1rem;}
+        .daftar-fitur p::before {content:""; position:absolute; left:0;}
+        .tambah {color:#ffdd00; font-weight:900; text-align:center; margin-top:15px; font-size:1.15rem; display:block;}
+        .harga {font-size:2rem; font-weight:900; color:#ffdd00; text-align:center; margin:20px 0 25px; text-shadow:0 0 15px rgba(255,221,0,0.4);}
+        .tombol-lanjut {display:block; width:100%; padding:20px; font-size:1.3rem; font-weight:900; color:#fff; background:rgba(16,185,129,0.75); border:none; border-radius:15px; cursor:pointer; margin-bottom:12px; transition:all 0.2s ease; box-shadow:0 0 20px rgba(16,185,129,0.3);}
+        .tombol-lanjut:hover {background:rgba(5,150,105,0.9); transform:scale(1.02);}
+        .tombol-lanjut:active {transform:scale(0.97);}
+        .tombol-saluran {display:inline-flex; align-items:center; gap:6px; padding:8px 16px; font-size:0.9rem; font-weight:bold; color:#93c5fd; background:rgba(59,130,246,0.15); border:1px solid rgba(96,165,250,0.4); border-radius:50px; text-decoration:none; cursor:pointer; transition:all 0.2s ease; margin-bottom:30px;}
+        .tombol-saluran:hover {background:rgba(59,130,246,0.25); color:#dbeafe; border-color:rgba(96,165,250,0.7);}
+        .judul-bayar {font-size:1.8rem; font-weight:900; text-align:center; margin-bottom:25px; color:#ffdd00;}
+        .peringatan-pembayaran {border:3px solid #ff9800; background:rgba(255,152,0,0.15); color:#ffeb3b; padding:18px; border-radius:12px; margin-bottom:25px; font-weight:bold; font-size:1rem; line-height:1.7; backdrop-filter:blur(4px);}
+        .qris-box {background:rgba(15,23,42,0.55); border:2px dashed rgba(96,165,250,0.4); border-radius:18px; padding:25px; margin-bottom:25px; text-align:center; backdrop-filter:blur(4px);}
+        .qris-box img {width:100%; border-radius:12px; margin-bottom:15px; border:2px solid rgba(255,255,255,0.2); display:block; max-width:320px; height:auto; object-fit:contain; margin:0 auto 15px; background:#fff; padding:10px;}
+        .tombol-simpan {width:100%; padding:15px; background:rgba(30,58,138,0.8); color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; cursor:pointer; transition:all 0.2s ease;}
+        .tombol-simpan:hover {background:rgba(30,58,138,1); transform:scale(1.02);}
+        .area-input {transition:all 0.3s ease;}
+        .area-input.sembunyi {opacity:0; height:0; margin:0; overflow:hidden; pointer-events:none;}
+        .tombol-pilih {display:block; padding:18px; border:2px dashed rgba(96,165,250,0.6); border-radius:15px; color:#93c5fd; font-weight:bold; cursor:pointer; margin-bottom:18px; background:rgba(59,130,246,0.15); font-size:1.2rem; text-align:center; backdrop-filter:blur(4px); transition:all 0.2s ease;}
+        .tombol-pilih:hover {border-color:#60a5fa; background:rgba(59,130,246,0.25);}
+        input[type=file] {display:none;}
+        .preview {border:2px solid rgba(59,130,246,0.6); border-radius:15px; padding:15px; margin-bottom:18px; background:rgba(15,23,42,0.5); min-height:180px; display:flex; align-items:center; justify-content:center; color:#93c5fd; font-weight:bold; backdrop-filter:blur(4px);}
+        .preview img {width:100%; border-radius:10px; display:block;}
+        .tombol-kirim {width:100%; padding:20px; background:rgba(15,23,42,0.8); color:#fff; border:3px solid rgba(59,130,246,0.7); border-radius:15px; font-size:1.5rem; font-weight:900; cursor:pointer; box-shadow:0 0 20px rgba(16,185,129,0.2); transition:all 0.3s ease;}
+        .tombol-kirim.sembunyi {opacity:0; height:0; margin:0; padding:0; border:none; pointer-events:none;}
+        .tombol-kirim:disabled {opacity:0.4; cursor:not-allowed;}
+        .tombol-kirim:hover {background:rgba(30,41,59,0.95); transform:scale(1.02);}
+        .pesan {display:none; padding:18px; border-radius:15px; font-weight:bold; margin:20px 0; font-size:1.2rem; text-align:center; backdrop-filter:blur(4px);}
+        .pesan.sukses {display:block; border:2px solid rgba(16,185,129,0.7); color:#86efac; background:rgba(16,185,129,0.12);}
+        .pesan.gagal {display:block; border:2px solid rgba(239,68,68,0.7); color:#fca5a5; background:rgba(239,68,68,0.12);}
+        .info-berhasil {display:none; margin-top:25px; padding:25px; border:3px solid rgba(16,185,129,0.7); border-radius:18px; background:rgba(16,185,129,0.15); text-align:center; backdrop-filter:blur(8px);}
+        .info-berhasil.tampil {display:block;}
+        .info-berhasil h2 {color:#86efac; margin-bottom:10px; font-size:2rem; font-weight:900; text-transform:uppercase;}
+        .link-tutorial {display:block; padding:15px; background:linear-gradient(135deg,#10b981,#3b82f6); color:#fff; border-radius:12px; font-weight:bold; font-size:1.1rem; text-decoration:none; margin-bottom:20px; transition:all 0.2s ease;}
+        .link-tutorial:hover {transform:translateY(-2px); box-shadow:0 5px 15px rgba(59,130,246,0.4);}
+        .form-request {margin-top:15px; text-align:left;}
+        .form-request.sembunyi {display:none !important;}
+        .kotak-kirim-data {margin-top:20px; padding:20px; border:3px solid #ffdd00; border-radius:15px; background:rgba(255,221,0,0.1); display:none;}
+        .kotak-kirim-data.tampil {display:block;}
+        .judul-kirim {color:#ffdd00; font-weight:bold; font-size:1.2rem; text-align:center; margin-bottom:15px; line-height:1.5;}
+        .teks-kode {background:rgba(0,0,0,0.4); padding:15px; border-radius:10px; font-family:monospace; font-size:1rem; color:#fff; word-break:break-all; margin-bottom:15px; border:1px solid #ffdd00; font-weight:bold; font-size:1.1rem;}
+        .tombol-salin {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; background:#3b82f6; color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; cursor:pointer; margin-bottom:10px; transition:all 0.2s ease;}
+        .tombol-salin.sukses {background:#10b981;}
+        .tombol-salin:hover {transform:translateY(-2px);}
+        .tombol-hubungi {display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:15px; background:#25d366; color:#fff; border:none; border-radius:12px; font-weight:bold; font-size:1.1rem; cursor:pointer; text-decoration:none; transition:all 0.2s ease;}
+        .tombol-hubungi:hover {transform:translateY(-2px);}
+        .data-akun {margin:15px 0; padding:15px; background:rgba(30,41,59,0.7); border:2px solid rgba(147,197,253,0.5); border-radius:12px; color:#fff; font-weight:bold; line-height:1.8; display:none;}
+        .data-akun.aktif {display:block;}
+        .data-akun span {color:#ffdd00;}
+        .input-group {margin-bottom:15px;}
+        .input-group label {display:block; margin-bottom:8px; font-weight:bold; color:#93c5fd; font-size:1.1rem;}
+        .syarat-pw {font-size:0.9rem; color:#ffdd00; margin-top:5px; line-height:1.5;}
+        .input-group input {width:100%; padding:14px; border-radius:10px; border:2px solid rgba(96,165,250,0.5); background:rgba(15,23,42,0.7); color:#fff; font-size:1rem; outline:none; transition:all 0.2s ease;}
+        .input-group input:focus {border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.3);}
+        #inputPwGrup {display:none;}
+    </style>
+</head>
+<body>
+    <video autoplay muted loop playsinline>
+        <source src="https://www.image2url.com/r2/default/videos/1783267463148-d941441a-03bd-43ce-b70c-31714136682f.mp4" type="video/mp4">
+    </video>
+    <div class="latar-gelap"></div>
+
+    <div class="halaman-blokir" id="halamanBlokir">
+        <div class="teks-blokir"> ANDA TELAH DIBLOKIR<br>Karena gagal mengirim bukti 1 kali</div>
+    </div>
+
+    <div class="layar-proses" id="layarProses">
+        <div class="ikon-loading"></div>
+        <div class="teks-proses" id="teksProses"> SEDANG MEMERIKSA BUKTI...</div>
+    </div>
+
+    <div class="wadah">
+        <div class="bagian aktif" id="halDepan">
+            <div class="header"><div class="logo">LUT<span>BOTZ</span></div></div>
+            <div class="label-atas"> TERPERCAYA DAN OTOMATIS</div>
+            <h1 class="judul-utama">LUTBOTZ<br><span>WEB ORDER</span></h1>
+            <p class="deskripsi">Solusi layanan pemantauan jarak jauh terbaik<br>yang aman, terpercaya, dan mudah digunakan.</p>
+            <button class="tombol-besar" onclick="bukaHalaman('halProduk')">LIHAT LAYANAN </button>
+            <div class="kotak-statistik">
+                <div class="ikon"></div>
+                <div class="teks-stat">
+                    <div class="label-stat">KUNJUNGAN WEB</div>
+                    <div class="angka-stat">5.020</div>
+                </div>
+            </div>
+
+            <div class="bagian-testimoni">
+                <h2 class="judul-testimoni">TESTIMONI PELANGGAN </h2>
+                <p class="deskripsi-testimoni">Beberapa Cerita Dari Pelanggan Yang Udah Pernah Belanja Dan Pakai Layanan Di LUTBOTZ.</p>
+                
+                <div class="wrapper-geser">
+                    <div class="daftar-kartu">
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">mantap gacor order ya satset </p>
+                        </div>
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">wih Satset nih web mas</p>
+                        </div>
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">amanah selalu mas mantap😘</p>
+                        </div>
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">sumpah SATSET kalo order di website ini😝✌️</p>
+                        </div>
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">gacor apk LUTBOTZ ya🥴</p>
+                        </div>
+                        <div class="kartu-testimoni">
+                            <div class="header-kartu">
+                                <div class="avatar"></div>
+                                <div class="nama">komendariweb</div>
+                            </div>
+                            <div class="bintang"></div>
+                            <p class="isi-testimoni">gacor apk PPL ya😋✌️</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bagian-komen">
+                 <button class="tombol-komen" onclick="munculPesan()">💬 KOMEN TENTANG PENDAPAT ANDA</button>
+                 <div class="kotak-pesan" id="kotakPesan">❌ ERROR MAAF KOMEN TERLALU BANYAK 🙏</div>
+             </div>
+         </div>
+         <div class="bagian" id="halProduk">
+             <div class="kembali" onclick="bukaHalaman('halDepan')">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <path d="M19 12H5M12 19l-7-7 7-7"/>
+                 </svg>
+                 KEMBALI KE BERANDA
+             </div>
+             <h2 class="judul-bagian">PILIH PRODUK KAMI</h2>
+             
+             <div class="kartu-produk" onclick="bukaHalaman('halLutbotz')">
+                 <h3>📱 PROJECT LUTBOTZ</h3>
+                 <p>APK PEMANTAUAN JARAK JAUH VERSI TERBARU<br>Fitur lengkap, aman, dan berlaku selamanya!</p>
+                 <p style="margin-top:15px; color:#ffdd00; font-weight:bold;">👉 KLIK UNTUK LIHAT DETAIL & BELI</p>
+             </div>
+             <div class="kartu-produk" onclick="window.location.href='https://kklxjir-cmd.github.io/Orderweb/lolipop'">
+                 <h3>📡 PPL PROJECT</h3>
+                 <p>APK PENGENDALI & PEMANTAUAN JARAK JAUH<br>Sistem keamanan login panel, anti ribet & lengkap!</p>
+                 <p style="margin-top:15px; color:#ffdd00; font-weight:bold;">👉 KLIK UNTUK LIHAT DETAIL & BELI</p>
+             </div>
+         </div>
+         <div class="bagian" id="halLutbotz">
+             <div class="kembali" onclick="bukaHalaman('halProduk')">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <path d="M19 12H5M12 19l-7-7 7-7"/>
+                 </svg>
+                 KEMBALI KE DAFTAR PRODUK
+             </div>
+             <h2 class="judul-bagian">PROJECT LUTBOTZ</h2>
+             <div class="foto-produk">
+                 <img src="https://i.ibb.co/rKWKpgPN/lutbotz.jpg" alt="LUTBOTZ" crossorigin="anonymous" loading="lazy">
+             </div>
+             <div class="daftar-fitur">
+                 <h3>📋 FITUR LENGKAP</h3>
+                 <p>Lampu kilat perangkat target</p>
+                 <p>Lacak lokasi secara realtime</p>
+                 <p>Kirim peringatan & notifikasi</p>
+                 <p>Getarkan perangkat target</p>
+                 <p>Kunci layar secara permanen</p>
+                 <p>Buka kunci perangkat target</p>
+                 <p>Putar suara dari jarak jauh</p>
+                 <p>Putar video secara tersembunyi</p>
+                 <p>Ganti wallpaper perangkat</p>
+                 <p>Sembunyikan ikon aplikasi</p>
+                 <p>Baca SMS & riwayat panggilan</p>
+                 <p>Akses daftar kontak lengkap</p>
+                 <p>Ambil foto kamera diam-diam</p>
+                 <p>Lihat layar & kamera langsung</p>
+                 <p>Akses galeri & file penyimpanan</p>
+                 <span class="tambah">+ PANDUAN LENGKAP & TUTORIAL PENGGUNAAN PENUH SETELAH PEMBELIAN</span>
+             </div>
+             <div class="harga">💰 HARGA: Rp 45.001 / PERMANEN</div>
+             <button class="tombol-lanjut" onclick="lanjutPembayaran()">✅ SAYA SETUJU & LANJUT KE PEMBAYARAN</button>
+             <div style="text-align:center;">
+                 <a href="https://www.whatsapp.com/channel/0029VbCNa8EISTkC3UQnwe0f" target="_blank" class="tombol-saluran">📢 SALURAN WHATSAPP ADMIN</a>
+             </div>
+         </div>
+         <div class="bagian" id="halBayar">
+             <div class="kembali" onclick="bukaHalaman('halLutbotz')">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                     <path d="M19 12H5M12 19l-7-7 7-7"/>
+                 </svg>
+                 KEMBALI KE DETAIL PRODUK
+             </div>
+             <h2 class="judul-bayar">PEMBAYARAN PROJECT LUTBOTZ</h2>
+             <div class="peringatan-pembayaran">
+                 ⚠️ PERINGATAN WAJIB:<br>
+                 ✅ **WAJIB SCREENSHOT BUKTI PEMBAYARAN** — BUKAN DIFOTO<br>
+                 ✅ **HANYA BOLEH 1 KALI COBA SAJA**<br>
+                 ✅ GAGAL 1 KALI → LANGSUNG DIBLOKIR PERMANEN
+             </div>
+             <div class="qris-box">
+                 <img src="https://i.ibb.co/gLKpf636/qris.png" alt="QRIS Pembayaran" crossorigin="anonymous" loading="lazy">
+                 <button class="tombol-simpan" onclick="alert('Gambar QRIS disimpan, silakan bayar lalu kirim screenshot')">💾 SIMPAN GAMBAR QRIS</button>
+             </div>
+             <div class="area-input" id="areaInput">
+                 <label class="tombol-pilih" for="fileBukti">📷 PILIH FOTO BUKTI TRANSFER</label>
+                 <input type="file" id="fileBukti" accept="image/*" onchange="tampilPreview(this)">
+                 <div class="preview" id="preview">Belum ada foto dipilih</div>
+             </div>
+             <button class="tombol-kirim" id="tombolKirim" onclick="kirimBukti()">✅ KIRIM BUKTI TRANSFER</button>
+             <div class="pesan" id="pesan"></div>
+             <div class="info-berhasil" id="infoBerhasil">
+                 <h2>✅ BUKTI TERKONFIRMASI VALID</h2>
+                 <a href="https://lutbotz.site/team/tutoriallutbotz.html" target="_blank" class="link-tutorial">🔗 LINK APK + VIDEO TUTORIAL FULL</a>
+                  <div class="form-request" id="formRequest">
+                      <p style="margin-bottom:15px;">Silakan isi data di bawah ini untuk membuat akun akses 👇</p>
+                      <div class="input-group">
+                          <label>Alamat Email (wajib @gmail.com)</label>
+                          <input type="email" id="emailUser" placeholder="contoh@gmail.com">
+                      </div>
+                      <div class="input-group">
+                          <label>Nomor WhatsApp</label>
+                          <input type="tel" id="waUser" placeholder="81234567890">
+                      </div>
+                      <button class="tombol-lanjut" id="btnBuatPw" onclick="tampilInputPw()">🔑 BUAT PASSWORD</button>
+                      <div class="input-group" id="inputPwGrup">
+                          <label>Password Akun</label>
+                          <input type="password" id="pwUser" placeholder="Buat password yang kuat">
+                          <div class="syarat-pw">📌 Syarat Password:<br>✅ Minimal 4 Huruf<br>✅ Minimal 1 Angka<br>✅ Minimal 2 Simbol (@ # $ ! % & *)</div>
+                          <button class="tombol-lanjut" id="btnKonfirmasi" onclick="tampilKodeKirim()">✅ KONFIRMASI DATA</button>
+                      </div>
+                  </div>
+                  <div class="kotak-kirim-data" id="kotakKirimData">
+                      <div class="judul-kirim">
+                          KIRIM KE ADMIN, BIAR DI-ACC JANGAN LUPA KIRIM TEKS+BUKTI TF ⬇️
+                      </div>
+                      <div class="teks-kode" id="teksKode"></div>
+                      <button class="tombol-salin" id="btnSalin" onclick="salinTeks()">
+                          📋 SALIN TEKS
+                      </button>
+                      <a href="https://wa.me/6285743518627" target="_blank" class="tombol-hubungi">
+                          💬 HUBUNGI ADMIN
+                      </a>
+                  </div>
+                  <div class="data-akun" id="tampilDataAkun">
+                      📋 DATA AKUN ANDA:<br>
+                      📧 Email: <span id="emailTampil"></span><br>
+                      🔒 Password: <span id="pwTampil"></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+ <script>
+ const NO_WA_ADMIN = "6285743518627";
+ const statusBlokir = localStorage.getItem('diblokir_lutbotz') === 'YA';
+ const statusValid = localStorage.getItem('bukti_valid') === 'YA';
+ const sudahKirimData = localStorage.getItem('sudah_kirim_data') === 'YA';
+ let pesanHanyaLxregist = "";
+ let sudahCoba = localStorage.getItem('sudah_coba') === 'YA';
+ let fileBukti = null;
+ if (statusBlokir) {
+     document.getElementById('halamanBlokir').classList.add('aktif');
+     document.body.style.overflow = 'hidden';
+ } else if (statusValid) {
+     bukaHalaman('halBayar');
+     document.getElementById('areaInput').classList.add('sembunyi');
+     document.getElementById('tombolKirim').classList.add('sembunyi');
+     document.querySelector('.peringatan-pembayaran').style.display = 'none';
+     document.querySelector('.qris-box').style.display = 'none';
+     document.getElementById('infoBerhasil').classList.add('tampil');
+     if (sudahKirimData) {
+         document.getElementById('formRequest').classList.add('sembunyi');
+         document.getElementById('kotakKirimData').style.display = 'none';
+         document.getElementById('tampilDataAkun').classList.add('aktif');
+     }
+ }
+ function bukaHalaman(id) {
+     if (statusBlokir || statusValid) return;
+     document.querySelectorAll('.bagian').forEach(b => b.classList.remove('aktif'));
+     document.getElementById(id).classList.add('aktif');
+     window.scrollTo(0, 0);
+ }
+ function lanjutPembayaran() {
+     if (statusBlokir || statusValid) return;
+     document.getElementById('layarProses').classList.add('aktif');
+     setTimeout(() => {
+         document.getElementById('layarProses').classList.remove('aktif');
+         bukaHalaman('halBayar');
+     }, 1200);
+ }
+ function munculPesan() {
+     const pesan = document.getElementById('kotakPesan');
+     pesan.style.display = 'block';
+     setTimeout(() => pesan.style.display = 'none', 2000);
+ }
+ function tampilInputPw() {
+     if(localStorage.getItem('sudah_kirim_data') === 'YA') return;
+     document.getElementById('inputPwGrup').style.display = 'block';
+     document.getElementById('btnBuatPw').style.display = 'none';
+ }
+ function tampilKodeKirim() {
+     const email = document.getElementById('emailUser').value.trim();
+     const waInput = document.getElementById('waUser').value.trim();
+     const pw = document.getElementById('pwUser').value.trim();
+     const nomorWA = '62' + waInput;
+     if (!email.endsWith('@gmail.com')) { alert('❌ Email wajib menggunakan @gmail.com!'); return false; }
+     if (waInput.length < 10 || isNaN(waInput)) { alert('❌ Nomor WhatsApp tidak valid! Masukkan tanpa angka 0 di depan'); return false; }
+     const hitungHuruf = (pw.match(/[a-zA-Z]/g) || []).length;
+     const hitungAngka = (pw.match(/[0-9]/g) || []).length;
+     const hitungSimbol = (pw.match(/[^a-zA-Z0-9\s]/g) || []).length;
+     if (hitungHuruf < 4) { alert('❌ Password harus memiliki minimal 4 huruf!'); return false; }
+     if (hitungAngka < 1) { alert('❌ Password harus memiliki minimal 1 angka!'); return false; }
+     if (hitungSimbol < 2) { alert('❌ Password harus memiliki minimal 2 simbol!'); return false; }
+     pesanHanyaLxregist = `/lxregist ${email} ${nomorWA} ${nomorWA} ${pw}`;
+     document.getElementById('teksKode').textContent = pesanHanyaLxregist;
+     document.getElementById('formRequest').classList.add('sembunyi');
+     document.getElementById('kotakKirimData').classList.add('tampil');
+     localStorage.setItem('sudah_kirim_data', 'YA');
+     localStorage.setItem('email_req', email);
+     localStorage.setItem('pw_req', pw);
+     document.getElementById('emailTampil').textContent = email;
+     document.getElementById('pwTampil').textContent = pw;
+ }
+ async function salinTeks() {
+     const btn = document.getElementById('btnSalin');
+     try {
+         await navigator.clipboard.writeText(pesanHanyaLxregist);
+         btn.textContent = '✅ BERHASIL DISALIN!';
+         btn.classList.add('sukses');
+         setTimeout(() => {
+             btn.textContent = '📋 SALIN TEKS';
+             btn.classList.remove('sukses');
+         }, 2500);
+     } catch {
+         alert('❌ Gagal menyalin, silakan salin manual teks di atas');
+     }
+ }
+ function perjelasGambar(file) {
+     return new Promise(resolve => {
+         const img = new Image();
+         img.onload = () => {
+             const canvas = document.createElement('canvas');
+             const ctx = canvas.getContext('2d');
+             const skala = Math.max(2.5, 300 / Math.min(img.width, img.height));
+             canvas.width = img.width * skala;
+             canvas.height = img.height * skala;
+             ctx.filter = 'grayscale(100%) contrast(350%) brightness(130%) saturate(0%)';
+             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+             canvas.toBlob(b => resolve(b), 'image/png', 1.0);
+         };
+         img.onerror = () => resolve(file);
+         img.src = URL.createObjectURL(file);
+     });
+ }
+ function cekNama(teks) {
+     const bersih = teks.replace(/[^A-Z0-9]/g, '');
+     const polaValid = /L0LIP0P|L0LIPOP|LOL1POP|LOLIP0P|LOLIPOP|L0L1P0P|L0L1POP|LOL1P0P|LOLIP0P|LOLIPOP|L0LIP0P|L0LIPOP|LOLLIPOP|L0LLIP0P/i;
+     return polaValid.test(bersih);
+ }
+ function cekNominal(teks) {
+     const bersih = teks.replace(/[^0-9]/g, '');
+     return bersih.includes('45001') || bersih.includes('45.001') || bersih.includes('45,001');
+ }
+ function tampilPreview(input) {
+     const pr = document.getElementById('preview');
+     const pesan = document.getElementById('pesan');
+     pesan.style.display = 'none';
+     if (input.files && input.files[0]) {
+         fileBukti = input.files[0];
+         const baca = new FileReader();
+         baca.onload = e => pr.innerHTML = `<img src="${e.target.result}" alt="Bukti">`;
+         baca.readAsDataURL(fileBukti);
+     } else {
+         pr.innerHTML = "Belum ada foto dipilih";
+         fileBukti = null;
+     }
+ }
+ async function kirimBukti() {
+     if (statusBlokir || statusValid || sudahCoba) return;
+     const pesan = document.getElementById('pesan');
+     const infoProses = document.getElementById('layarProses');
+     const infoBerhasil = document.getElementById('infoBerhasil');
+     const areaInput = document.getElementById('areaInput');
+     const tombolKirim = document.getElementById('tombolKirim');
+     
+     pesan.style.display = 'none';
+     infoBerhasil.classList.remove('tampil');
+     
+     if (!fileBukti) {
+         pesan.className = 'pesan gagal';
+         pesan.textContent = '❌ Silakan pilih foto bukti terlebih dahulu!';
+         pesan.style.display = 'block';
+         return;
+     }
+     
+     sudahCoba = true;
+     localStorage.setItem('sudah_coba', 'YA');
+     infoProses.classList.add('aktif');
+     
+     try {
+         const gambarJelas = await perjelasGambar(fileBukti);
+         const hasilOcr = await Tesseract.recognize(gambarJelas, 'ind+eng', {
+             tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:Rp '
+         });
+         const teksHasil = hasilOcr.data.text;
+         
+         if (cekNama(teksHasil) && cekNominal(teksHasil)) {
+             localStorage.setItem('bukti_valid', 'YA');
+             infoProses.classList.remove('aktif');
+             areaInput.classList.add('sembunyi');
+             tombolKirim.classList.add('sembunyi');
+             document.querySelector('.peringatan-pembayaran').style.display = 'none';
+             document.querySelector('.qris-box').style.display = 'none';
+             infoBerhasil.classList.add('tampil');
+         } else {
+             localStorage.setItem('diblokir_lutbotz', 'YA');
+             infoProses.classList.remove('aktif');
+             document.getElementById('halamanBlokir').classList.add('aktif');
+             document.body.style.overflow = 'hidden';
+         }
+     } catch {
+         localStorage.setItem('diblokir_lutbotz', 'YA');
+         infoProses.classList.remove('aktif');
+         document.getElementById('halamanBlokir').classList.add('aktif');
+         document.body.style.overflow = 'hidden';
+     }
+ }
+ </script>
+ </body>
+ </html>
