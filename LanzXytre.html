@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LanzXytre — PLP PROJECT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Poppins', Arial, sans-serif;
+        }
+
+        html, body {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 30px 20px;
+            overflow-x: hidden;
+        }
+
+        /* 🎬 VIDEO LATAR BELAKANG — DIPASTIKAN KELIHATAN */
+        .video-latar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -3;
+            background: linear-gradient(135deg, #0f0a1a 0%, #2a1454 100%);
+        }
+
+        /* 🌫️ LAPISAN TRANSPARAN — GELAP SEDIKIT BIAR TEKS JELAS TAPI VIDEO TETAP KELIHATAN */
+        .lapisan-transparan {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 10, 26, 0.55); /* ← 0.55 = transparan, video tetap kelihatan jelas! */
+            z-index: -2;
+        }
+
+        .wadah {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .kotak-utama {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            border-radius: 24px;
+            padding: 50px 35px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 50px rgba(139, 92, 246, 0.15),
+                inset 0 0 30px rgba(139, 92, 246, 0.05);
+            animation: muncul 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        @keyframes muncul {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .judul {
+            font-size: clamp(1.4rem, 4vw, 2rem);
+            font-weight: 700;
+            color: #e0d7ff;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            min-height: 3.5em;
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .kursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background: #a78bfa;
+            margin-left: 4px;
+            animation: kedip 0.8s infinite;
+            vertical-align: text-bottom;
+            box-shadow: 0 0 10px #a78bfa;
+        }
+
+        @keyframes kedip {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .deskripsi {
+            font-size: 0.95rem;
+            color: #d4ccff;
+            line-height: 1.8;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: munculDes 1s ease-out 4s forwards;
+        }
+
+        @keyframes munculDes {
+            to { opacity: 0.9; transform: translateY(0); }
+        }
+
+        .tombol-tiktok {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #00f2ea 0%, #ff0050 100%);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 16px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 25px rgba(0, 242, 234, 0.35);
+            opacity: 0;
+            transform: translateY(20px);
+            animation: munculTombol 1s ease-out 5s forwards;
+        }
+
+        @keyframes munculTombol {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tombol-tiktok:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 35px rgba(0, 242, 234, 0.5);
+        }
+
+        .tombol-tiktok:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .logo-tiktok {
+            font-size: 1.4rem;
+        }
+
+        .bawah {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 🎬 VIDEO LATAR BELAKANG -->
+    <video class="video-latar" id="videoLatar" autoplay muted loop playsinline>
+        <source src="https://www.image2url.com/r2/default/videos/1787366433815-1fa366d9-a20e-456b-b62b-0bc26b28b970.mp4" type="video/mp4">
+    </video>
+
+    <!-- 🌫️ LAPISAN TRANSPARAN — BIAR VIDEO TETAP KELIHATAN -->
+    <div class="lapisan-transparan"></div>
+
+    <div class="wadah">
+        <div class="kotak-utama">
+            <h1 class="judul" id="teksKetik"></h1>
+
+            <p class="deskripsi">
+                I am a digital user, here I introduce one of the PLP PROJECT applications, the function of the application is for the safety of children under 18 years, not for criminal matters, aimed at positive things
+            </p>
+
+            <a href="https://tiktok.com/@lanzxytre6" target="_blank" class="tombol-tiktok">
+                <span class="logo-tiktok">🎵</span>
+                My TikTok
+            </a>
+        </div>
+
+        <p class="bawah">© 2026 PLP PROJECT — All Rights Reserved</p>
+    </div>
+
+    <script>
+        // ⌨️ ANIMASI KETIK
+        const teksTarget = "Let me introduce myself; my name is LanzXytre";
+        const elemenTeks = document.getElementById('teksKetik');
+        let indeks = 0;
+
+        function ketikHuruf() {
+            if (indeks < teksTarget.length) {
+                elemenTeks.innerHTML = teksTarget.substring(0, indeks + 1) + '<span class="kursor"></span>';
+                indeks++;
+                setTimeout(ketikHuruf, 80);
+            } else {
+                elemenTeks.innerHTML = teksTarget + '<span class="kursor"></span>';
+            }
+        }
+
+        // ✅ PASTIKAN VIDEO BERJALAN
+        const video = document.getElementById('videoLatar');
+        
+        window.addEventListener('load', () => {
+            setTimeout(ketikHuruf, 800);
+            // Paksa main video
+            video.play().catch(err => {
+                console.log('⚠️ Video butuh interaksi dulu:', err);
+            });
+        });
+    </script>
+
+</body>
+</html>
